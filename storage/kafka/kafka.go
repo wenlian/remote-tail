@@ -107,7 +107,7 @@ func newStorage(machineName string) (storage.StorageDriver, error) {
 	}
 
 	config.Producer.RequiredAcks = kafka.WaitForAll
-	config.Producer.Flush.Frequency = 3 * time.Second // Flush batches
+	config.Producer.Flush.Frequency = 3 * time.Second // Flush batches every 3s
 
 	brokerList := strings.Split(*brokers, ",")
 

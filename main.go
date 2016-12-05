@@ -12,10 +12,14 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/wenlian/remote-tail/command"
 	"github.com/wenlian/remote-tail/console"
+	"github.com/wenlian/remote-tail/storage"
+	_ "github.com/wenlian/remote-tail/storage/kafka"
 )
 
 var mossSep = ".--. --- .-- . .-. . -..   -... -.--   -- -.-- .-.. -..- ... .-- \n"
-
+var (
+	storageDriver = flag.String("storage_driver", "kafka", fmt.Sprintf("Storage `driver` to use. Data is always cached shortly in memory, this controls where data is pushed besides the local cache. Empty means none. Options are: <empty>, %s", strings.Join(storage.ListDrivers(), ", ")))
+)
 var welcomeMessage string = getWelcomeMessage() + console.ColorfulText(console.TextMagenta, mossSep)
 
 var filePath *string = flag.String("file", "", "-file=\"/home/data/logs/**/*.log\"")
@@ -142,6 +146,13 @@ func main() {
 					console.ColorfulText(console.TextYellow, "->"),
 					output.Content,
 				)
+				if output.Content != "" && *storageDriver != "" {
+					backendStorage, err := storage.New(*storageDriver)
+					if err != nil {
+						log.Println(err)
+					}
+					backendStorage.AddStats(output)
+				}
 			}
 		}()
 	} else {

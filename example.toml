@@ -23,11 +23,11 @@ password="iflytek"
 tail_file="/iflytek/server/skynet/logs/*.log;/iflytek/data/elasticsearch/logs/*.log;"
 port=22
 
-[servers.3]
-server_name="测试服务器3"
-hostname="192.168.76.73"
-user="root"
-password="iflytek"
-tail_file="/iflytek/server/skynet/logs/*.log"
-port=22
+# [servers.3]
+# server_name="测试服务器3"
+# hostname="192.168.76.73"
+# user="root"
+# password="iflytek"
+# tail_file="/iflytek/server/skynet/logs/*.log"
+# port=22
 
