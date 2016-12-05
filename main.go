@@ -10,8 +10,8 @@ import (
 	"sync"
 
 	"github.com/BurntSushi/toml"
-	"github.com/mylxsw/remote-tail/command"
-	"github.com/mylxsw/remote-tail/console"
+	"github.com/wenlian/remote-tail/command"
+	"github.com/wenlian/remote-tail/console"
 )
 
 var mossSep = ".--. --- .-- . .-. . -..   -... -.--   -- -.-- .-.. -..- ... .-- \n"
@@ -20,7 +20,7 @@ var welcomeMessage string = getWelcomeMessage() + console.ColorfulText(console.T
 
 var filePath *string = flag.String("file", "", "-file=\"/home/data/logs/**/*.log\"")
 var hostStr *string = flag.String("hosts", "", "-hosts=root@192.168.1.225,root@192.168.1.226")
-var configFile *string = flag.String("conf", "", "-conf=example.toml")
+var configFile *string = flag.String("conf", "example.toml", "-conf=example.toml")
 
 func usageAndExit(message string) {
 
@@ -36,13 +36,11 @@ func usageAndExit(message string) {
 
 func printWelcomeMessage(config command.Config) {
 	fmt.Println(welcomeMessage)
-
 	for _, server := range config.Servers {
 		// If there is no tail_file for a service configuration, the global configuration is used
 		if server.TailFile == "" {
 			server.TailFile = config.TailFile
 		}
-
 		serverInfo := fmt.Sprintf("%s@%s:%s", server.User, server.Hostname, server.TailFile)
 		fmt.Println(console.ColorfulText(console.TextMagenta, serverInfo))
 	}
@@ -95,6 +93,7 @@ func main() {
 	}
 
 	config := parseConfig(*filePath, *hostStr, *configFile)
+
 	printWelcomeMessage(config)
 
 	outputs := make(chan command.Message, 255)
@@ -119,9 +118,17 @@ func main() {
 			if server.Port == 0 {
 				server.Port = 22
 			}
-
-			cmd := command.NewCommand(server)
-			cmd.Execute(outputs)
+			pathArr := strings.Split(server.TailFile, ";")
+			log.Println(pathArr)
+			for _, logPath := range pathArr {
+				if len(logPath) > 2 {
+					cmd := command.NewCommand(server, logPath)
+					wg.Add(1)
+					go func() {
+						cmd.Execute(outputs)
+					}()
+				}
+			}
 		}(server)
 	}
 
@@ -129,8 +136,9 @@ func main() {
 		go func() {
 			for output := range outputs {
 				fmt.Printf(
-					"%s %s %s",
+					"%s %s %s %s",
 					console.ColorfulText(console.TextGreen, output.Host),
+					console.ColorfulText(console.TextGreen, output.Path),
 					console.ColorfulText(console.TextYellow, "->"),
 					output.Content,
 				)

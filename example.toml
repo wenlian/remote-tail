@@ -9,19 +9,25 @@ tail_file="/data/logs/laravel.log"
 
 [servers.1]
 server_name="测试服务器1"
-hostname="test1.server.aicode.cc"
+hostname="192.168.76.71"
 user="root"
-tail_file="/var/log/messages"
+password="iflytek"
+tail_file="/iflytek/server/skynet/logs/*.log"
 port=22
 
 [servers.2]
 server_name="测试服务器2"
-hostname="test2.server.aicode.cc"
+hostname="192.168.76.72"
 user="root"
-tail_file="/var/log/messages"
+password="iflytek"
+tail_file="/iflytek/server/skynet/logs/*.log;/iflytek/data/elasticsearch/logs/*.log;"
+port=22
 
 [servers.3]
 server_name="测试服务器3"
-hostname="test2.server.aicode.cc"
-user="demo"
-password="123456"
+hostname="192.168.76.73"
+user="root"
+password="iflytek"
+tail_file="/iflytek/server/skynet/logs/*.log"
+port=22
+
