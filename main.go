@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/BurntSushi/toml"
+	//	"github.com/samuel/go-zookeeper/zk"
 	"github.com/wenlian/remote-tail/command"
 	"github.com/wenlian/remote-tail/console"
 	"github.com/wenlian/remote-tail/storage"
@@ -18,7 +19,7 @@ import (
 
 var mossSep = ".--. --- .-- . .-. . -..   -... -.--   -- -.-- .-.. -..- ... .-- \n"
 var (
-	storageDriver = flag.String("storage_driver", "kafka", fmt.Sprintf("Storage `driver` to use. Data is always cached shortly in memory, this controls where data is pushed besides the local cache. Empty means none. Options are: <empty>, %s", strings.Join(storage.ListDrivers(), ", ")))
+	storageDriver = flag.String("storage_driver", "kafka", fmt.Sprintf("Storage `driver` to use. This controls where data is pushed to. Empty means none. Options are: <empty>, %s", strings.Join(storage.ListDrivers(), ", ")))
 )
 var welcomeMessage string = getWelcomeMessage() + console.ColorfulText(console.TextMagenta, mossSep)
 
@@ -157,7 +158,7 @@ func main() {
 					if err != nil {
 						log.Println(err)
 					}
-					backendStorage.AddStats(output)
+					backendStorage.AddStats(output, config.KafkaBrokers)
 				}
 			}
 		}()

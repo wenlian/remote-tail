@@ -8,7 +8,7 @@ import (
 )
 
 type StorageDriver interface {
-	AddStats(msg command.Message) error
+	AddStats(msg command.Message, brokers string) error
 	Close() error
 }
 

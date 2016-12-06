@@ -37,7 +37,14 @@ AB两台服务器中的项目均将日志写到文件系统的`/home/data/logs/l
 
     # 全局配置,所有的servers中tail_file配置的默认值
     tail_file="/data/logs/laravel.log"
-
+    
+    # 日志等级判断
+    #   0. info 关键词:INFO
+    #   1. warn 关键词:WARN
+    #    2,default. err 关键词:ERR
+    log_level=2
+    # 添加kafka持久化支持
+    kafka=docker52
     # 服务器配置,可以配置多个
     # 如果不提供password,则使用当前用户的ssh公钥,建议采用该方式,使用密码方式不安全
     # server_name, hostname, user 配置为必选,其它可选
@@ -49,7 +56,7 @@ AB两台服务器中的项目均将日志写到文件系统的`/home/data/logs/l
     user="root"
     tail_file="/var/log/messages"
     # 指定ssh端口，不指定的情况下使用默认值22
-    port=2222
+    port=22
 
     [servers.2]
     server_name="测试服务器2"
