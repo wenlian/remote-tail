@@ -18,13 +18,11 @@ import (
 )
 
 var mossSep = ".--. --- .-- . .-. . -..   -... -.--   -- -.-- .-.. -..- ... .-- \n"
-var (
-	storageDriver = flag.String("storage_driver", "kafka", fmt.Sprintf("Storage `driver` to use. This controls where data is pushed to. Empty means none. Options are: <empty>, %s", strings.Join(storage.ListDrivers(), ", ")))
-)
+
 var welcomeMessage string = getWelcomeMessage() + console.ColorfulText(console.TextMagenta, mossSep)
 
-var filePath *string = flag.String("file", "", "-file=\"/home/data/logs/**/*.log\"")
-var hostStr *string = flag.String("hosts", "", "-hosts=root@192.168.1.225,root@192.168.1.226")
+var filePath *string = flag.String("file", "", "eg:-file=\"/home/data/logs/**/*.log\"")
+var hostStr *string = flag.String("hosts", "", "eg:-hosts=root@192.168.1.225,root@192.168.1.226")
 var configFile *string = flag.String("conf", "config.toml", "-conf=config.toml")
 
 func usageAndExit(message string) {
@@ -153,8 +151,8 @@ func main() {
 					console.ColorfulText(console.TextYellow, "->"),
 					output.Content,
 				)
-				if output.Content != "" && *storageDriver != "" && *storageDriver != "\r\n" {
-					backendStorage, err := storage.New(*storageDriver)
+				if output.Content != "" && config.StorageDriver != "" && config.StorageDriver != "\r\n" {
+					backendStorage, err := storage.New(config.StorageDriver)
 					if err != nil {
 						log.Println(err)
 					}

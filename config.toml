@@ -6,7 +6,7 @@ tail_file="/data/logs/laravel.log"
 # 	1. warn 关键词:WARN
 #	 2,default. err 关键词:ERR
 log_level=2
-
+storage_driver="kafka"
 # kafka config
 kafka_brokers="docker52:9092"
 kafka_topic="remote-tail"

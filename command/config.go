@@ -12,6 +12,7 @@ type Server struct {
 type Config struct {
 	TailFile       string            `toml:"tail_file"`
 	LogLevel       int               `toml:"log_level"`
+	StorageDriver  string            `toml:"storage_driver"`
 	KafkaBrokers   string            `toml:"kafka_brokers"`
 	KafkaTopic     string            `toml:"kafka_topic"`
 	KafkaCertfile  string            `toml:"kafka_certfile"`
