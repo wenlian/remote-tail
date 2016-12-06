@@ -2,7 +2,7 @@
 
 RemoteTail是一款支持同步显示多台远程服务器的日志文件内容更新的工具，使用它可以让你同时监控多台服务器中某个（某些）日志文件的变更，将多台服务器的`tail -f xxx.log`命令的输出合并展示。
 
-![logo](https://oayrssjpa.qnssl.com/remote-tail.jpg?20161011)
+添加log过滤条件支持，INFO、WARN、ERR
 
 ## 使用场景
 
@@ -11,11 +11,7 @@ RemoteTail是一款支持同步显示多台远程服务器的日志文件内容�
 AB两台服务器中的项目均将日志写到文件系统的`/home/data/logs/laravel.log`文件。这种情况下如果我们需要查看web日志是否正常，一般情况下就需要分别登陆两台服务器，然后分别执行`tail -f /home/data/logs/laravel.log`查看日志文件的最新内容，这在排查问题的时候是非常不方便的。RemoteTail就是为了解决这种问题的，开发人员可以使用它同步显示两台（多台）服务器的日志信息。
 
 ## 安装
-
-在[release页面](https://github.com/mylxsw/remote-tail/releases)下载对应的`remote-tail-平台`可执行文件，将该文件加入到系统的`PATH`环境变量指定的目录中即可。
-
-比如，Centos下可以放到`/usr/local/bin`目录。
-
+编译之后可以放到`/usr/local/bin`目录。
     mv remote-tail-linux /usr/local/bin/remote-tail
 
 ## 使用方法
@@ -37,8 +33,15 @@ AB两台服务器中的项目均将日志写到文件系统的`/home/data/logs/l
 
     # 全局配置,所有的servers中tail_file配置的默认值
     tail_file="/data/logs/laravel.log"
-
-    # 服务器配置,可以配置多个
+    
+    # 日志等级判断
+    # 	0. info 关键词:INFO
+    # 	1. warn 关键词:WARN
+    #	 2,default. err 关键词:ERR
+    log_level=2
+    # 添加kafka持久化支持
+    kafka=docker52
+    # 服务器配置,可以配置多个
     # 如果不提供password,则使用当前用户的ssh公钥,建议采用该方式,使用密码方式不安全
     # server_name, hostname, user 配置为必选,其它可选
     [servers]
@@ -47,8 +50,8 @@ AB两台服务器中的项目均将日志写到文件系统的`/home/data/logs/l
     server_name="测试服务器1"
     hostname="test1.server.aicode.cc"
     user="root"
-    tail_file="/var/log/messages"
-    # 指定ssh端口，不指定的情况下使用默认值22
+    tail_file="/var/log/messages" # 支持多目录，用逗号隔开
+    # 指定ssh端口，不指定的情况下使用默认值22
     port=2222
 
     [servers.2]
@@ -65,17 +68,4 @@ AB两台服务器中的项目均将日志写到文件系统的`/home/data/logs/l
 
 执行命令：
 
-    remote-tail -conf=example.toml
-
-## 如何贡献
-
-欢迎贡献新的功能以及bug修复，**Fork**项目后修改代码，测试通过后提交**pull request**即可。
-
-## 问题反馈
-
-你可以在github的issue中提出你的bug或者其它需求，也可以通过以下方式直接联系我。
-
-- 微博：[管宜尧](http://weibo.com/code404)
-- 微信：mylxsw
-
-![WEIXIN](https://oayrssjpa.qnssl.com/join_weixin.jpg)
+    ./remote-tail
