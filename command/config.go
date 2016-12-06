@@ -11,5 +11,6 @@ type Server struct {
 
 type Config struct {
 	TailFile string            `toml:"tail_file"`
+	LogLevel int               `toml:"log_level"`
 	Servers  map[string]Server `toml:"servers"`
 }

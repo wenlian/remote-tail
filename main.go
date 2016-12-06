@@ -24,7 +24,7 @@ var welcomeMessage string = getWelcomeMessage() + console.ColorfulText(console.T
 
 var filePath *string = flag.String("file", "", "-file=\"/home/data/logs/**/*.log\"")
 var hostStr *string = flag.String("hosts", "", "-hosts=root@192.168.1.225,root@192.168.1.226")
-var configFile *string = flag.String("conf", "example.toml", "-conf=example.toml")
+var configFile *string = flag.String("conf", "config.toml", "-conf=config.toml")
 
 func usageAndExit(message string) {
 
@@ -126,7 +126,13 @@ func main() {
 			log.Println(pathArr)
 			for _, logPath := range pathArr {
 				if len(logPath) > 2 {
-					cmd := command.NewCommand(server, logPath)
+					/******************************************
+					* 日志等级判断
+					* 0. info 关键词:INFO
+					* 1. warn 关键词:WARN
+					* 2,default. err 关键词:ERR
+					******************************************/
+					cmd := command.NewCommand(server, logPath, config.LogLevel)
 					wg.Add(1)
 					go func() {
 						cmd.Execute(outputs)
@@ -146,7 +152,7 @@ func main() {
 					console.ColorfulText(console.TextYellow, "->"),
 					output.Content,
 				)
-				if output.Content != "" && *storageDriver != "" {
+				if output.Content != "" && *storageDriver != "" && *storageDriver != "\r\n" {
 					backendStorage, err := storage.New(*storageDriver)
 					if err != nil {
 						log.Println(err)

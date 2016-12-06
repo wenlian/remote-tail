@@ -41,7 +41,7 @@ func (driver *kafkaStorage) infoToDetailSpec(msg command.Message) *command.Messa
 	message := &command.Message{
 		Host:    msg.Host,
 		Path:    msg.Path,
-		Content: msg.Content,
+		Content: strings.Replace(msg.Content, "\r\n", "", -1),
 	}
 	return message
 

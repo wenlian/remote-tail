@@ -30,12 +30,22 @@ type Message struct {
 }
 
 // Create a new command
-func NewCommand(server Server, logPath string) (cmd *Command) {
+func NewCommand(server Server, logPath string, level int) (cmd *Command) {
+	levelStr := `ERR`
+	switch level {
+	case 0:
+		levelStr = `INFO | WARN | ERR`
+	case 1:
+		levelStr = `WARN | ERR`
+	default:
+		levelStr = `ERR`
+	}
+
 	cmd = &Command{
 		Host:   server.Hostname,
 		User:   server.User,
 		Path:   logPath,
-		Script: fmt.Sprintf("tail -f %s", logPath),
+		Script: fmt.Sprintf("tail -f %s | grep %s", logPath, levelStr),
 		Server: server,
 	}
 	if !strings.Contains(cmd.Host, ":") {
@@ -45,6 +55,7 @@ func NewCommand(server Server, logPath string) (cmd *Command) {
 }
 
 // Execute the remote command
+// 缺少日志精确地址判断
 func (cmd *Command) Execute(output chan Message) error {
 	var wg sync.WaitGroup
 
@@ -55,7 +66,8 @@ func (cmd *Command) Execute(output chan Message) error {
 	}
 
 	if err := client.Connect(); err != nil {
-		panic(fmt.Sprintf("[%s] unable to connect: %s", cmd.Host, err))
+		//panic(fmt.Sprintf("[%s] unable to connect: %s", cmd.Host, err))
+		fmt.Sprintf("[%s] unable to connect: %s", cmd.Host, err)
 		return err
 	}
 	defer client.Close()
