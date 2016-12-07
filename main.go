@@ -24,6 +24,7 @@ var welcomeMessage string = getWelcomeMessage() + console.ColorfulText(console.T
 var filePath *string = flag.String("file", "", "eg:-file=\"/home/data/logs/**/*.log\"")
 var hostStr *string = flag.String("hosts", "", "eg:-hosts=root@192.168.1.225,root@192.168.1.226")
 var configFile *string = flag.String("conf", "config.toml", "-conf=config.toml")
+var zkServer *string = flag.String("zk", "", "-zk 192.168.76.52:2181")
 
 func usageAndExit(message string) {
 
@@ -51,13 +52,14 @@ func printWelcomeMessage(config command.Config) {
 }
 
 func parseConfig(filePath string, hostStr string, configFile string) (config command.Config) {
+	//本地配置文件不为空，读取本地文件
 	if configFile != "" {
 		if _, err := toml.DecodeFile(configFile, &config); err != nil {
 			log.Fatal(err)
 		}
 
 	} else {
-
+		//本地文件为空，读取zk
 		var hosts []string = strings.Split(hostStr, ",")
 
 		config = command.Config{}
@@ -129,7 +131,8 @@ func main() {
 					* 日志等级判断
 					* 0. info 关键词:INFO
 					* 1. warn 关键词:WARN
-					* 2,default. err 关键词:ERR
+					* 2. err 关键词:ERR
+					* default. 所有log
 					******************************************/
 					cmd := command.NewCommand(server, logPath, config.LogLevel)
 					wg.Add(1)
@@ -142,24 +145,29 @@ func main() {
 	}
 
 	if len(config.Servers) > 0 {
-		go func() {
-			for output := range outputs {
-				fmt.Printf(
-					"%s %s %s %s",
-					console.ColorfulText(console.TextGreen, output.Host),
-					console.ColorfulText(console.TextGreen, output.Path),
-					console.ColorfulText(console.TextYellow, "->"),
-					output.Content,
-				)
-				if output.Content != "" && config.StorageDriver != "" && config.StorageDriver != "\r\n" {
-					backendStorage, err := storage.New(config.StorageDriver)
-					if err != nil {
-						log.Println(err)
-					}
-					backendStorage.AddStats(output, config.KafkaBrokers)
-				}
+		//
+		if config.StorageDriver != "" {
+			backendStorage, err := storage.New(config.StorageDriver)
+			if err != nil {
+				log.Println(err)
 			}
-		}()
+			go func() {
+				for output := range outputs {
+					fmt.Printf(
+						"%s %s %s %s",
+						console.ColorfulText(console.TextGreen, output.Host),
+						console.ColorfulText(console.TextGreen, output.Path),
+						console.ColorfulText(console.TextYellow, "->"),
+						output.Content,
+					)
+					if output.Content != "" && output.Content != "\r\n" && config.StorageDriver != "" {
+						backendStorage.AddStats(output, config.KafkaBrokers)
+					}
+				}
+			}()
+		} else {
+			log.Println("Storage Type nil!")
+		}
 	} else {
 		fmt.Println(console.ColorfulText(console.TextRed, "No target host is available"))
 	}

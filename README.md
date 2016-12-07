@@ -67,5 +67,5 @@ AB两台服务器中的项目均将日志写到文件系统的`/home/data/logs/l
 
 执行命令：
 
-    remote-tail -conf=example.toml
+    ./remote-tail
 

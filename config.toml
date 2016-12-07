@@ -1,11 +1,12 @@
-
+# 无此配置文件，链接ZK
 # 全局配置,所有的servers中tail_file配置的默认值
 tail_file="/data/logs/laravel.log"
 # 日志等级判断
 # 	0. info 关键词:INFO
 # 	1. warn 关键词:WARN
-#	 2,default. err 关键词:ERR
-log_level=2
+#	2. err 关键词:ERR
+#	default. 所有log
+log_level=4
 storage_driver="kafka"
 # kafka config
 kafka_brokers="docker52:9092"

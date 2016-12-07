@@ -34,18 +34,20 @@ func NewCommand(server Server, logPath string, level int) (cmd *Command) {
 	levelStr := `ERR`
 	switch level {
 	case 0:
-		levelStr = `INFO | WARN | ERR`
+		levelStr = ` | grep 'INFO | WARN | ERR'`
 	case 1:
-		levelStr = `WARN | ERR`
+		levelStr = ` | grep 'WARN | ERR'`
+	case 2:
+		levelStr = ` | grep ERR`
 	default:
-		levelStr = `ERR`
+		levelStr = ``
 	}
 
 	cmd = &Command{
 		Host:   server.Hostname,
 		User:   server.User,
 		Path:   logPath,
-		Script: fmt.Sprintf("tail -f %s | grep %s", logPath, levelStr),
+		Script: fmt.Sprintf("tail -f %s %s", logPath, levelStr),
 		Server: server,
 	}
 	if !strings.Contains(cmd.Host, ":") {
